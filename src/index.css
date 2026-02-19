@@ -1,0 +1,98 @@
+@import "tailwindcss";
+
+:root {
+  /* Agri Cloud Theme - Antigravity Inspired */
+  --color-primary: #10B981;
+  /* Vibrant Emerald Green */
+  --color-primary-dark: #059669;
+  /* Deep Emerald */
+  --color-secondary: #064E3B;
+  /* Dark Forest Green */
+  --color-secondary-light: #34D399;
+  /* Soft Spring Green */
+  --color-bg: #F0FDF4;
+  /* Very Light Mint/White */
+  --color-surface: #FFFFFF;
+  --color-text-main: #111827;
+  /* Near Black */
+  --color-text-muted: #6B7280;
+  /* Cool Gray */
+  --color-border: #E5E7EB;
+
+  --radius: 0.75rem;
+
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+
+  --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
+}
+
+@theme {
+  --color-primary: var(--color-primary);
+  --color-primary-dark: var(--color-primary-dark);
+  --color-secondary: var(--color-secondary);
+  --color-secondary-light: var(--color-secondary-light);
+  --color-bg: var(--color-bg);
+  --color-surface: var(--color-surface);
+  --color-text-main: var(--color-text-main);
+  --color-text-muted: var(--color-text-muted);
+  --color-border: var(--color-border);
+
+  --animate-lift: lift 0.3s ease-out forwards;
+  --animate-fade-in: fadeIn 0.5s ease-out forwards;
+}
+
+@keyframes lift {
+  0% {
+    transform: translateY(0);
+    box-shadow: var(--shadow-sm);
+  }
+
+  100% {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lg);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+body {
+  background-color: var(--color-bg);
+  color: var(--color-text-main);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Antigravity Utilities */
+.glass-panel {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+}
+
+.frosted-card {
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.hover-lift {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.hover-lift:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
