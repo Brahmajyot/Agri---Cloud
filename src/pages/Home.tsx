@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button"
 import { Link } from "react-router-dom"
-import { ArrowRight, BookOpen, Upload, Users } from "lucide-react"
+import { BookOpen, Upload, Users } from "lucide-react"
 
 export default function Home() {
     return (

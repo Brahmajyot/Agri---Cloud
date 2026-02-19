@@ -13,12 +13,15 @@ const port = process.env.PORT || 3000;
 
 const io = new Server(httpServer, {
     cors: {
-        origin: "*", // Allow all origins for simplicity, in production restrict this
+        origin: process.env.CLIENT_URL || "http://localhost:5173",
         methods: ["GET", "POST", "DELETE"]
     }
 });
 
-app.use(cors());
+app.use(cors({
+    origin: process.env.CLIENT_URL || "http://localhost:5173",
+    methods: ["GET", "POST", "DELETE", "PUT", "PATCH"]
+}));
 app.use(express.json());
 
 const { Pool } = pg;
