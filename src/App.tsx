@@ -8,6 +8,7 @@ import Upload from "@/pages/Upload"
 import Browse from "@/pages/Browse"
 import SignInPage from "@/pages/auth/SignIn"
 import SignUpPage from "@/pages/auth/SignUp"
+import Profile from "@/pages/Profile"
 
 const clerkPubKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
 
@@ -61,7 +62,7 @@ function ClerkProviderWithRoutes() {
           <Route path="/profile" element={
             <>
               <SignedIn>
-                <Dashboard /> {/* Reusing Dashboard for profile for now */}
+                <Profile />
               </SignedIn>
               <SignedOut>
                 <RedirectToSignIn />
