@@ -11,15 +11,18 @@ const app = express();
 const httpServer = createServer(app);
 const port = process.env.PORT || 3000;
 
+// Ensure CLIENT_URL doesn't have a trailing slash
+const clientUrl = (process.env.CLIENT_URL || "http://localhost:5173").replace(/\/$/, "");
+
 const io = new Server(httpServer, {
     cors: {
-        origin: process.env.CLIENT_URL || "http://localhost:5173",
+        origin: clientUrl,
         methods: ["GET", "POST", "DELETE"]
     }
 });
 
 app.use(cors({
-    origin: process.env.CLIENT_URL || "http://localhost:5173",
+    origin: clientUrl,
     methods: ["GET", "POST", "DELETE", "PUT", "PATCH"]
 }));
 app.use(express.json());
