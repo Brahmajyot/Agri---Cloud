@@ -5,6 +5,7 @@ import api from "@/lib/api"
 import { useUser } from "@clerk/clerk-react"
 import { toast } from "sonner"
 import DeleteModal from "@/components/ui/DeleteModal"
+import SEO from "@/components/ui/SEO"
 
 interface Note {
     id: string
@@ -16,6 +17,7 @@ interface Note {
     file_name: string
     created_at: string
     user_id: string
+    slug?: string
 }
 
 export default function Browse() {
@@ -71,6 +73,12 @@ export default function Browse() {
 
     return (
         <div className="space-y-8 animate-fade-in">
+            <SEO
+                title="B.Sc Agriculture Notes by Semester — 1st to 4th Year PDF"
+                description="Browse and download B.Sc Agriculture notes semester-wise. Find 1st semester notes PDF, 2nd semester syllabus, PYQ papers for BHU, HAU, UET and more agriculture universities in India."
+                keywords="b.sc agriculture 1st semester notes pdf, b.sc agriculture 2nd semester syllabus, bsc agriculture notes semester wise, bsc agriculture previous year question paper pdf, bsc agriculture questions papers UET bhu, bsc agriculture study material free download, agriculture notes pdf download"
+                canonical="/browse"
+            />
 
             {/* Delete Modal */}
             <DeleteModal
@@ -135,6 +143,12 @@ function NoteCard({
     onDeleteRequest: (note: Note) => void
 }) {
     const handleCardClick = () => {
+        // If the note has a slug, navigate to the SEO-friendly detail page
+        if (note.slug) {
+            window.location.href = `/notes/${note.slug}`
+            return
+        }
+        // Legacy fallback for notes without a slug
         const ext = note.file_name.split('.').pop()?.toLowerCase()
         const isImage = ['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(ext || '')
         const isPdf = ext === 'pdf'

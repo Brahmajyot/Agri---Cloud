@@ -1,0 +1,14 @@
+User-agent: *
+Allow: /
+Allow: /browse
+Allow: /sign-in
+Allow: /sign-up
+
+# Keep authenticated/private routes out of search index
+Disallow: /dashboard
+Disallow: /upload
+Disallow: /profile
+Disallow: /api/
+
+# Point crawlers to the sitemap
+Sitemap: https://agri-cloud-tau.vercel.app/sitemap.xml

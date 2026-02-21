@@ -2,6 +2,7 @@ import { useUser } from "@clerk/clerk-react"
 import { useEffect, useState } from "react"
 import { io } from "socket.io-client"
 import api from "@/lib/api"
+import SEO from "@/components/ui/SEO"
 
 export default function Dashboard() {
     const { user } = useUser()
@@ -47,6 +48,12 @@ export default function Dashboard() {
 
     return (
         <div className="space-y-8 animate-fade-in">
+            {/* Dashboard is private — noindex keeps it out of search results */}
+            <SEO
+                title="My Dashboard — Agri Cloud"
+                description="Your personal Agri Cloud dashboard. View your uploaded notes, track stats, and manage your agriculture study content."
+                canonical="/dashboard"
+            />
             <div className="flex items-center justify-between">
                 <h1 className="text-3xl font-bold tracking-tight text-[var(--color-secondary)]">
                     Good Evening, {user?.firstName || "Student"} 🌱

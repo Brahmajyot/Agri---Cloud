@@ -68,8 +68,30 @@ const createTableQuery = `
 `;
 
 pool.query(createTableQuery)
-    .then(() => console.log("Files table created or already exists"))
-    .catch(err => console.error("Error creating files table", err));
+    .then(() => {
+        console.log("Files table created or already exists");
+        // Add slug column to existing tables (safe — IF NOT EXISTS)
+        return pool.query(`
+            ALTER TABLE files ADD COLUMN IF NOT EXISTS slug STRING;
+        `);
+    })
+    .then(() => console.log("Slug column ready"))
+    .catch(err => console.error("Error during table setup", err));
+
+/**
+ * Converts a title string to a URL-safe slug.
+ * Example: "B.Sc Agriculture 1st Sem Notes" → "bsc-agriculture-1st-sem-notes"
+ */
+function slugify(text) {
+    return text
+        .toString()
+        .toLowerCase()
+        .trim()
+        .replace(/[^\w\s-]/g, '')   // Remove non-word chars (but keep hyphens)
+        .replace(/[\s_]+/g, '-')    // Replace spaces/underscores with hyphens
+        .replace(/-+/g, '-')         // Collapse multiple hyphens
+        .slice(0, 80);               // Keep slugs short
+}
 
 // Socket.io connection handling
 io.on('connection', (socket) => {
@@ -102,6 +124,24 @@ app.get('/api/files', async (req, res) => {
     }
 });
 
+// Get single file by slug (for NoteDetails page)
+app.get('/api/files/slug/:slug', async (req, res) => {
+    const { slug } = req.params;
+    try {
+        const result = await pool.query(
+            'SELECT * FROM files WHERE slug = $1 LIMIT 1',
+            [slug]
+        );
+        if (result.rows.length === 0) {
+            return res.status(404).json({ error: 'Note not found' });
+        }
+        res.json(result.rows[0]);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Failed to fetch note' });
+    }
+});
+
 // Save file metadata
 app.post('/api/files', async (req, res) => {
     const { title, subject, semester, year, fileUrl, fileName, userId } = req.body;
@@ -111,12 +151,20 @@ app.post('/api/files', async (req, res) => {
     }
 
     try {
+        // Generate a unique slug from the title
+        let slug = slugify(title);
+        // Handle slug collisions by appending a short random suffix
+        const existing = await pool.query('SELECT id FROM files WHERE slug = $1', [slug]);
+        if (existing.rows.length > 0) {
+            slug = `${slug}-${Math.random().toString(36).slice(2, 7)}`;
+        }
+
         const query = `
-      INSERT INTO files (title, subject, semester, year, file_url, file_name, user_id)
-      VALUES ($1, $2, $3, $4, $5, $6, $7)
+      INSERT INTO files (title, subject, semester, year, file_url, file_name, user_id, slug)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
       RETURNING *;
     `;
-        const values = [title, subject, semester, year, fileUrl, fileName, userId];
+        const values = [title, subject, semester, year, fileUrl, fileName, userId, slug];
         const result = await pool.query(query, values);
 
         // Emit event to all connected clients

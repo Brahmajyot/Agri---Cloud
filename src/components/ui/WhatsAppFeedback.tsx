@@ -6,93 +6,93 @@ const WHATSAPP_NUMBER = import.meta.env.VITE_WHATSAPP_NUMBER as string;
 const DEFAULT_MESSAGE = "Hi! I need support with AgriCloud. 🌾";
 
 export default function WhatsAppFeedback() {
-    const [open, setOpen] = useState(false);
-    const [message, setMessage] = useState("");
+  const [open, setOpen] = useState(false);
+  const [message, setMessage] = useState("");
 
-    const handleSend = () => {
-        const text = message.trim() || DEFAULT_MESSAGE;
-        const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(text)}`;
-        window.open(url, "_blank", "noopener,noreferrer");
-        setOpen(false);
-        setMessage("");
-    };
+  const handleSend = () => {
+    const text = message.trim() || DEFAULT_MESSAGE;
+    const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(text)}`;
+    window.open(url, "_blank", "noopener,noreferrer");
+    setOpen(false);
+    setMessage("");
+  };
 
-    return (
-        <>
-            {/* Floating WhatsApp Button */}
+  return (
+    <>
+      {/* Floating WhatsApp Button */}
+      <button
+        onClick={() => setOpen((v) => !v)}
+        aria-label="Open WhatsApp Support"
+        className="whatsapp-fab"
+        title="Chat with Support on WhatsApp"
+      >
+        {/* WhatsApp SVG Icon */}
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 32 32"
+          fill="white"
+          width="28"
+          height="28"
+        >
+          <path d="M16 2C8.28 2 2 8.28 2 16c0 2.46.65 4.76 1.78 6.76L2 30l7.44-1.74A13.92 13.92 0 0 0 16 30c7.72 0 14-6.28 14-14S23.72 2 16 2zm0 25.5a11.44 11.44 0 0 1-5.83-1.6l-.42-.25-4.42 1.03 1.06-4.3-.27-.44A11.5 11.5 0 1 1 16 27.5zm6.3-8.57c-.34-.17-2.02-1-2.33-1.11-.31-.11-.54-.17-.77.17-.23.34-.88 1.11-1.08 1.34-.2.22-.4.25-.74.08-.34-.17-1.44-.53-2.74-1.69a10.27 10.27 0 0 1-1.89-2.36c-.2-.34-.02-.52.15-.69.15-.15.34-.4.51-.6.17-.2.22-.34.34-.57.11-.22.06-.42-.03-.59-.08-.17-.77-1.85-1.05-2.54-.28-.67-.56-.58-.77-.59l-.65-.01c-.22 0-.59.08-.9.42-.31.34-1.17 1.14-1.17 2.79 0 1.64 1.2 3.23 1.37 3.45.17.22 2.36 3.6 5.72 5.05.8.35 1.42.55 1.91.71.8.26 1.53.22 2.11.13.64-.1 2.02-.82 2.3-1.62.28-.79.28-1.47.2-1.61-.08-.14-.31-.22-.65-.39z" />
+        </svg>
+      </button>
+
+      {/* Feedback Popup */}
+      {open && (
+        <div className="whatsapp-popup" role="dialog" aria-modal="true" aria-label="WhatsApp Support">
+          {/* Header */}
+          <div className="whatsapp-popup-header">
+            <div className="whatsapp-avatar">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="white" width="22" height="22">
+                <path d="M16 2C8.28 2 2 8.28 2 16c0 2.46.65 4.76 1.78 6.76L2 30l7.44-1.74A13.92 13.92 0 0 0 16 30c7.72 0 14-6.28 14-14S23.72 2 16 2zm0 25.5a11.44 11.44 0 0 1-5.83-1.6l-.42-.25-4.42 1.03 1.06-4.3-.27-.44A11.5 11.5 0 1 1 16 27.5zm6.3-8.57c-.34-.17-2.02-1-2.33-1.11-.31-.11-.54-.17-.77.17-.23.34-.88 1.11-1.08 1.34-.2.22-.4.25-.74.08-.34-.17-1.44-.53-2.74-1.69a10.27 10.27 0 0 1-1.89-2.36c-.2-.34-.02-.52.15-.69.15-.15.34-.4.51-.6.17-.2.22-.34.34-.57.11-.22.06-.42-.03-.59-.08-.17-.77-1.85-1.05-2.54-.28-.67-.56-.58-.77-.59l-.65-.01c-.22 0-.59.08-.9.42-.31.34-1.17 1.14-1.17 2.79 0 1.64 1.2 3.23 1.37 3.45.17.22 2.36 3.6 5.72 5.05.8.35 1.42.55 1.91.71.8.26 1.53.22 2.11.13.64-.1 2.02-.82 2.3-1.62.28-.79.28-1.47.2-1.61-.08-.14-.31-.22-.65-.39z" />
+              </svg>
+            </div>
+            <div className="whatsapp-popup-title">
+              <p className="whatsapp-popup-name">AgriCloud Support</p>
+              <p className="whatsapp-popup-status">🟢 Typically replies in minutes</p>
+            </div>
             <button
-                onClick={() => setOpen((v) => !v)}
-                aria-label="Open WhatsApp Support"
-                className="whatsapp-fab"
-                title="Chat with Support on WhatsApp"
+              onClick={() => setOpen(false)}
+              className="whatsapp-close-btn"
+              aria-label="Close"
             >
-                {/* WhatsApp SVG Icon */}
-                <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 32 32"
-                    fill="white"
-                    width="28"
-                    height="28"
-                >
-                    <path d="M16 2C8.28 2 2 8.28 2 16c0 2.46.65 4.76 1.78 6.76L2 30l7.44-1.74A13.92 13.92 0 0 0 16 30c7.72 0 14-6.28 14-14S23.72 2 16 2zm0 25.5a11.44 11.44 0 0 1-5.83-1.6l-.42-.25-4.42 1.03 1.06-4.3-.27-.44A11.5 11.5 0 1 1 16 27.5zm6.3-8.57c-.34-.17-2.02-1-2.33-1.11-.31-.11-.54-.17-.77.17-.23.34-.88 1.11-1.08 1.34-.2.22-.4.25-.74.08-.34-.17-1.44-.53-2.74-1.69a10.27 10.27 0 0 1-1.89-2.36c-.2-.34-.02-.52.15-.69.15-.15.34-.4.51-.6.17-.2.22-.34.34-.57.11-.22.06-.42-.03-.59-.08-.17-.77-1.85-1.05-2.54-.28-.67-.56-.58-.77-.59l-.65-.01c-.22 0-.59.08-.9.42-.31.34-1.17 1.14-1.17 2.79 0 1.64 1.2 3.23 1.37 3.45.17.22 2.36 3.6 5.72 5.05.8.35 1.42.55 1.91.71.8.26 1.53.22 2.11.13.64-.1 2.02-.82 2.3-1.62.28-.79.28-1.47.2-1.61-.08-.14-.31-.22-.65-.39z" />
-                </svg>
+              ✕
             </button>
+          </div>
 
-            {/* Feedback Popup */}
-            {open && (
-                <div className="whatsapp-popup" role="dialog" aria-modal="true" aria-label="WhatsApp Support">
-                    {/* Header */}
-                    <div className="whatsapp-popup-header">
-                        <div className="whatsapp-avatar">
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="white" width="22" height="22">
-                                <path d="M16 2C8.28 2 2 8.28 2 16c0 2.46.65 4.76 1.78 6.76L2 30l7.44-1.74A13.92 13.92 0 0 0 16 30c7.72 0 14-6.28 14-14S23.72 2 16 2zm0 25.5a11.44 11.44 0 0 1-5.83-1.6l-.42-.25-4.42 1.03 1.06-4.3-.27-.44A11.5 11.5 0 1 1 16 27.5zm6.3-8.57c-.34-.17-2.02-1-2.33-1.11-.31-.11-.54-.17-.77.17-.23.34-.88 1.11-1.08 1.34-.2.22-.4.25-.74.08-.34-.17-1.44-.53-2.74-1.69a10.27 10.27 0 0 1-1.89-2.36c-.2-.34-.02-.52.15-.69.15-.15.34-.4.51-.6.17-.2.22-.34.34-.57.11-.22.06-.42-.03-.59-.08-.17-.77-1.85-1.05-2.54-.28-.67-.56-.58-.77-.59l-.65-.01c-.22 0-.59.08-.9.42-.31.34-1.17 1.14-1.17 2.79 0 1.64 1.2 3.23 1.37 3.45.17.22 2.36 3.6 5.72 5.05.8.35 1.42.55 1.91.71.8.26 1.53.22 2.11.13.64-.1 2.02-.82 2.3-1.62.28-.79.28-1.47.2-1.61-.08-.14-.31-.22-.65-.39z" />
-                            </svg>
-                        </div>
-                        <div className="whatsapp-popup-title">
-                            <p className="whatsapp-popup-name">AgriCloud Support</p>
-                            <p className="whatsapp-popup-status">🟢 Typically replies in minutes</p>
-                        </div>
-                        <button
-                            onClick={() => setOpen(false)}
-                            className="whatsapp-close-btn"
-                            aria-label="Close"
-                        >
-                            ✕
-                        </button>
-                    </div>
+          {/* Chat Bubble */}
+          <div className="whatsapp-chat-area">
+            <div className="whatsapp-bubble">
+              👋 Hi there! How can we help you today? Send us a message and we'll get back to you on WhatsApp!
+            </div>
+          </div>
 
-                    {/* Chat Bubble */}
-                    <div className="whatsapp-chat-area">
-                        <div className="whatsapp-bubble">
-                            👋 Hi there! How can we help you today? Send us a message and we'll get back to you on WhatsApp!
-                        </div>
-                    </div>
+          {/* Input Area */}
+          <div className="whatsapp-input-area">
+            <textarea
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
+              placeholder="Type your message here..."
+              className="whatsapp-textarea"
+              rows={2}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && !e.shiftKey) {
+                  e.preventDefault();
+                  handleSend();
+                }
+              }}
+            />
+            <button onClick={handleSend} className="whatsapp-send-btn" aria-label="Send message">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white" width="20" height="20">
+                <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" />
+              </svg>
+            </button>
+          </div>
+        </div>
+      )}
 
-                    {/* Input Area */}
-                    <div className="whatsapp-input-area">
-                        <textarea
-                            value={message}
-                            onChange={(e) => setMessage(e.target.value)}
-                            placeholder="Type your message here..."
-                            className="whatsapp-textarea"
-                            rows={2}
-                            onKeyDown={(e) => {
-                                if (e.key === "Enter" && !e.shiftKey) {
-                                    e.preventDefault();
-                                    handleSend();
-                                }
-                            }}
-                        />
-                        <button onClick={handleSend} className="whatsapp-send-btn" aria-label="Send message">
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white" width="20" height="20">
-                                <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" />
-                            </svg>
-                        </button>
-                    </div>
-                </div>
-            )}
-
-            <style>{`
+      <style>{`
         .whatsapp-fab {
           position: fixed;
           bottom: 90px;
@@ -108,16 +108,26 @@ export default function WhatsAppFeedback() {
           align-items: center;
           justify-content: center;
           box-shadow: 0 4px 20px rgba(37,211,102,0.5);
-          transition: transform 0.2s ease, box-shadow 0.2s ease;
-          animation: wa-pulse 2.5s infinite;
+          transition: transform 0.2s ease;
+          /* No animation here — pulse is on ::before (composited) */
+        }
+        /* Composited pulse ring — only animates opacity + transform (GPU-accelerated) */
+        .whatsapp-fab::before {
+          content: '';
+          position: absolute;
+          inset: 0;
+          border-radius: 50%;
+          background: rgba(37,211,102,0.45);
+          animation: wa-pulse 2.5s ease-in-out infinite;
+          will-change: opacity, transform;
         }
         .whatsapp-fab:hover {
           transform: scale(1.1);
           box-shadow: 0 6px 28px rgba(37,211,102,0.7);
         }
         @keyframes wa-pulse {
-          0%, 100% { box-shadow: 0 4px 20px rgba(37,211,102,0.5); }
-          50% { box-shadow: 0 4px 32px rgba(37,211,102,0.85); }
+          0%, 100% { opacity: 0.7; transform: scale(1); }
+          50%       { opacity: 0;   transform: scale(1.55); }
         }
 
         /* On mobile, keep above bottom nav */
@@ -244,6 +254,6 @@ export default function WhatsAppFeedback() {
         }
         .whatsapp-send-btn:hover { transform: scale(1.08); }
       `}</style>
-        </>
-    );
+    </>
+  );
 }

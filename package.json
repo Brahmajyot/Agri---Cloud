@@ -1,11 +1,11 @@
 {
-  "name": "temp_app",
+  "name": "agri-cloud",
   "private": true,
   "version": "0.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "build": "node generate-sitemap.js && tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
     "server": "cd server && npm run dev"
@@ -13,6 +13,8 @@
   "dependencies": {
     "@clerk/clerk-react": "^5.60.0",
     "@radix-ui/react-slot": "^1.2.4",
+    "@react-pdf-viewer/core": "^3.12.0",
+    "@react-pdf-viewer/default-layout": "^3.12.0",
     "@tailwindcss/vite": "^4.1.18",
     "axios": "^1.13.5",
     "class-variance-authority": "^0.7.1",
@@ -20,9 +22,11 @@
     "date-fns": "^4.1.0",
     "framer-motion": "^12.34.0",
     "lucide-react": "^0.563.0",
+    "pdfjs-dist": "^5.4.624",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "react-dropzone": "^15.0.0",
+    "react-helmet-async": "^2.0.5",
     "react-router-dom": "^7.13.0",
     "socket.io-client": "^4.8.3",
     "sonner": "^2.0.7",

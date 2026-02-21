@@ -1,10 +1,17 @@
 import { Button } from "@/components/ui/button"
 import { Link } from "react-router-dom"
 import { BookOpen, Upload, Users } from "lucide-react"
+import SEO from "@/components/ui/SEO"
 
 export default function Home() {
     return (
         <div className="flex flex-col gap-16 py-10 md:py-20">
+            <SEO
+                title="B.Sc Agriculture Notes, PYQ Papers & Study Material Free Download"
+                description="Agri Cloud — India's premium platform for B.Sc Agriculture students. Download free semester notes, previous year question papers (PYQ), and study materials for BHU, HAU, Agra University and more."
+                keywords="bsc agriculture notes pdf, b.sc agriculture 1st semester notes pdf, bsc agriculture previous year question paper pdf, bsc agriculture study material, bsc agriculture entrance exam syllabus, b.sc agriculture 2nd semester syllabus, arihant bsc agriculture book pdf, bsc agriculture questions papers UET bhu, agriculture notes free download"
+                canonical="/"
+            />
             {/* Hero */}
             <section className="text-center space-y-6 animate-fade-in">
                 <div className="inline-flex items-center rounded-full border border-[var(--color-primary)]/20 bg-[var(--color-primary)]/10 px-3 py-1 text-sm font-medium text-[var(--color-primary)]">

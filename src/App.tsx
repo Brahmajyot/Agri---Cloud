@@ -11,6 +11,7 @@ const Browse = lazy(() => import("@/pages/Browse"))
 const SignInPage = lazy(() => import("@/pages/auth/SignIn"))
 const SignUpPage = lazy(() => import("@/pages/auth/SignUp"))
 const Profile = lazy(() => import("@/pages/Profile"))
+const NoteDetails = lazy(() => import("@/pages/NoteDetails"))
 
 const clerkPubKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
 
@@ -38,6 +39,8 @@ function ClerkProviderWithRoutes() {
           <Route element={<RootLayout />}>
             <Route path="/" element={<Home />} />
             <Route path="/browse" element={<Browse />} />
+            {/* Public note detail page — SEO-friendly slug URL */}
+            <Route path="/notes/:slug" element={<NoteDetails />} />
             <Route path="/sign-in/*" element={<SignInPage />} />
             <Route path="/sign-up/*" element={<SignUpPage />} />
 

@@ -3,15 +3,22 @@ import { SignedIn, SignedOut, UserButton } from "@clerk/clerk-react"
 import { Home, Search, PlusCircle, User, Compass, LayoutDashboard } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
-import logo from "@/assets/logo.png"
+import logo from "@/assets/logo.jpg"
 
 export function Navbar() {
     return (
         <nav className="sticky top-0 z-50 w-full border-b border-[var(--color-border)] bg-white/70 backdrop-blur-xl transition-all supports-[backdrop-filter]:bg-white/60">
             <div className="container mx-auto flex h-16 items-center justify-between px-4">
-                {/* Logo */}
+                {/* Logo — explicit dimensions prevent CLS; fetchPriority boosts LCP */}
                 <Link to="/" className="flex items-center gap-2">
-                    <img src={logo} alt="Agri Cloud Logo" className="h-9 w-9 object-contain hover:scale-105 transition-transform" />
+                    <img
+                        src={logo}
+                        alt="Agri Cloud Logo"
+                        width={36}
+                        height={36}
+                        fetchPriority="high"
+                        className="h-9 w-9 object-contain hover:scale-105 transition-transform"
+                    />
                     <span className="text-xl font-bold tracking-tight text-[var(--color-secondary)]">
                         Agri Cloud
                     </span>

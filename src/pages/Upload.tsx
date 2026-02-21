@@ -6,6 +6,7 @@ import axios from "axios"
 import { toast } from "sonner"
 import api from "@/lib/api"
 import { useUser } from "@clerk/clerk-react"
+import SEO from "@/components/ui/SEO"
 
 export default function UploadPage() {
     const { user } = useUser();
@@ -94,6 +95,12 @@ export default function UploadPage() {
 
     return (
         <div className="max-w-2xl mx-auto space-y-8 animate-fade-in">
+            <SEO
+                title="Upload B.Sc Agriculture Notes PDF — Share Study Material"
+                description="Upload your B.Sc Agriculture semester notes, PYQ papers, practical manuals, and study material to Agri Cloud. Help fellow agriculture students access free resources."
+                keywords="upload agriculture notes pdf, share bsc agriculture study material, agriculture notes community, upload bsc agriculture question papers"
+                canonical="/upload"
+            />
             <div>
                 <h1 className="text-3xl font-bold text-[var(--color-secondary)]">Upload Notes</h1>
                 <p className="text-[var(--color-text-muted)]">Share your knowledge with the community.</p>
