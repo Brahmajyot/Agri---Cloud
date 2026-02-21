@@ -1,5 +1,5 @@
 import { Search, FileText, Download, Trash2, Loader2 } from "lucide-react"
-import { useEffect, useState } from "react"
+import { useEffect, useState, useMemo } from "react"
 import { Button } from "@/components/ui/button"
 import api from "@/lib/api"
 import { useUser } from "@clerk/clerk-react"
@@ -20,8 +20,15 @@ interface Note {
 export default function Browse() {
     const { user } = useUser()
     const [searchTerm, setSearchTerm] = useState("")
+    const [debouncedSearch, setDebouncedSearch] = useState("")
     const [notes, setNotes] = useState<Note[]>([])
     const [loading, setLoading] = useState(true)
+
+    // Debounce: only filter after user stops typing for 300ms
+    useEffect(() => {
+        const timer = setTimeout(() => setDebouncedSearch(searchTerm), 300)
+        return () => clearTimeout(timer)
+    }, [searchTerm])
 
     const fetchNotes = async () => {
         try {
@@ -54,10 +61,10 @@ export default function Browse() {
         }
     }
 
-    const filteredNotes = notes.filter(note =>
-        note.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        note.subject.toLowerCase().includes(searchTerm.toLowerCase())
-    )
+    const filteredNotes = useMemo(() => notes.filter(note =>
+        note.title.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
+        note.subject.toLowerCase().includes(debouncedSearch.toLowerCase())
+    ), [notes, debouncedSearch])
 
     return (
         <div className="space-y-8 animate-fade-in">
