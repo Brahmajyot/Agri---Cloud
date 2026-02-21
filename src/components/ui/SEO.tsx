@@ -12,7 +12,7 @@ interface SEOProps {
 
 const SITE_NAME = 'Agri Cloud'
 const BASE_URL = 'https://agri-cloud-tau.vercel.app'
-const DEFAULT_OG_IMAGE = `${BASE_URL}/assets/logo-Za8sdaGn.png`
+const DEFAULT_OG_IMAGE = `${BASE_URL}/logo.jpg`
 
 /**
  * Drop-in SEO component — place at the top of any page to set
