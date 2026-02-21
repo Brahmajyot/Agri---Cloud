@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button"
 import api from "@/lib/api"
 import { useUser } from "@clerk/clerk-react"
 import { toast } from "sonner"
+import DeleteModal from "@/components/ui/DeleteModal"
 
 interface Note {
     id: string
@@ -23,6 +24,7 @@ export default function Browse() {
     const [debouncedSearch, setDebouncedSearch] = useState("")
     const [notes, setNotes] = useState<Note[]>([])
     const [loading, setLoading] = useState(true)
+    const [deleteTarget, setDeleteTarget] = useState<Note | null>(null)
 
     // Debounce: only filter after user stops typing for 300ms
     useEffect(() => {
@@ -46,18 +48,19 @@ export default function Browse() {
         fetchNotes()
     }, [])
 
-    const handleDelete = async (noteId: string) => {
-        if (!confirm("Are you sure you want to delete this file?")) return
-
+    const handleDeleteConfirm = async () => {
+        if (!deleteTarget || !user) return
         try {
-            await api.delete(`/api/files/${noteId}`, {
+            await api.delete(`/api/files/${deleteTarget.id}`, {
                 data: { userId: user?.id }
             })
-            toast.success("File deleted successfully")
-            setNotes(prev => prev.filter(n => n.id !== noteId))
+            toast.success("Note deleted 🗑️")
+            setNotes(prev => prev.filter(n => n.id !== deleteTarget.id))
         } catch (error) {
             console.error("Failed to delete file", error)
             toast.error("Failed to delete file")
+        } finally {
+            setDeleteTarget(null)
         }
     }
 
@@ -68,6 +71,15 @@ export default function Browse() {
 
     return (
         <div className="space-y-8 animate-fade-in">
+
+            {/* Delete Modal */}
+            <DeleteModal
+                isOpen={!!deleteTarget}
+                fileName={deleteTarget?.title}
+                onConfirm={handleDeleteConfirm}
+                onCancel={() => setDeleteTarget(null)}
+            />
+
             <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
                 <h1 className="text-3xl font-bold text-[var(--color-secondary)]">Browse Notes</h1>
                 <div className="relative w-full md:w-96">
@@ -95,7 +107,12 @@ export default function Browse() {
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                     {filteredNotes.length > 0 ? (
                         filteredNotes.map((note) => (
-                            <NoteCard key={note.id} note={note} currentUserId={user?.id} onDelete={handleDelete} />
+                            <NoteCard
+                                key={note.id}
+                                note={note}
+                                currentUserId={user?.id}
+                                onDeleteRequest={(n) => setDeleteTarget(n)}
+                            />
                         ))
                     ) : (
                         <div className="col-span-full text-center py-10 text-[var(--color-text-muted)]">
@@ -108,40 +125,28 @@ export default function Browse() {
     )
 }
 
-function NoteCard({ note, currentUserId, onDelete }: { note: Note, currentUserId?: string, onDelete: (id: string) => void }) {
-    const [isDeleting, setIsDeleting] = useState(false)
-
-    const handleDeleteClick = async (e: React.MouseEvent) => {
-        e.stopPropagation()
-        setIsDeleting(true)
-        await onDelete(note.id)
-        setIsDeleting(false)
-    }
+function NoteCard({
+    note,
+    currentUserId,
+    onDeleteRequest,
+}: {
+    note: Note
+    currentUserId?: string
+    onDeleteRequest: (note: Note) => void
+}) {
     const handleCardClick = () => {
-        const fileExtension = note.file_name.split('.').pop()?.toLowerCase()
-        const isImage = ['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(fileExtension || '')
-        const isPdf = fileExtension === 'pdf'
-
+        const ext = note.file_name.split('.').pop()?.toLowerCase()
+        const isImage = ['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(ext || '')
+        const isPdf = ext === 'pdf'
         if (isImage || isPdf) {
             window.open(note.file_url, '_blank')
         } else {
-            // Use Google Docs Viewer for other documents (docx, pptx, xlsx)
-            const viewerUrl = `https://docs.google.com/viewer?url=${encodeURIComponent(note.file_url)}`
-            window.open(viewerUrl, '_blank')
+            window.open(`https://docs.google.com/viewer?url=${encodeURIComponent(note.file_url)}`, '_blank')
         }
     }
 
-    const getDownloadUrl = (url: string) => {
-        // If it's a Cloudinary URL, add fl_attachment to force download
-        if (url.includes('cloudinary.com')) {
-            return url.replace('/upload/', '/upload/fl_attachment/')
-        }
-        return url
-    }
-
-    const handleDownloadClick = (e: React.MouseEvent) => {
-        e.stopPropagation()
-    }
+    const getDownloadUrl = (url: string) =>
+        url.includes('cloudinary.com') ? url.replace('/upload/', '/upload/fl_attachment/') : url
 
     return (
         <div
@@ -174,7 +179,7 @@ function NoteCard({ note, currentUserId, onDelete }: { note: Note, currentUserId
                         target="_blank"
                         rel="noopener noreferrer"
                         className="flex-1"
-                        onClick={handleDownloadClick}
+                        onClick={(e) => e.stopPropagation()}
                     >
                         <Button variant="outline" size="sm" className="w-full gap-2 hover:bg-[var(--color-primary)] hover:text-white transition-colors">
                             <Download size={14} />
@@ -186,10 +191,9 @@ function NoteCard({ note, currentUserId, onDelete }: { note: Note, currentUserId
                             variant="destructive"
                             size="icon"
                             className="h-8 w-8"
-                            onClick={handleDeleteClick}
-                            disabled={isDeleting}
+                            onClick={(e) => { e.stopPropagation(); onDeleteRequest(note) }}
                         >
-                            {isDeleting ? <Loader2 size={14} className="animate-spin" /> : <Trash2 size={14} />}
+                            <Trash2 size={14} />
                         </Button>
                     )}
                 </div>
