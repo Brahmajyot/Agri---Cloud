@@ -1,11 +1,29 @@
 {
     "rewrites": [
         {
-            "source": "/((?!api|sitemap|robots|google|assets|vite.svg).*)",
+            "source": "/((?!api|sitemap\\.xml|robots\\.txt|google.*\\.html|assets|logo\\.jpg|vite\\.svg).*)",
             "destination": "/index.html"
         }
     ],
     "headers": [
+        {
+            "source": "/sitemap.xml",
+            "headers": [
+                {
+                    "key": "Content-Type",
+                    "value": "application/xml"
+                }
+            ]
+        },
+        {
+            "source": "/robots.txt",
+            "headers": [
+                {
+                    "key": "Content-Type",
+                    "value": "text/plain"
+                }
+            ]
+        },
         {
             "source": "/(.*)",
             "headers": [
