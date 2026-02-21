@@ -1,6 +1,7 @@
 import { Outlet } from "react-router-dom"
 import { Navbar, BottomNav } from "./Navigation"
 import { Toaster } from "sonner"
+import WhatsAppFeedback from "@/components/ui/WhatsAppFeedback"
 
 export default function RootLayout() {
     return (
@@ -11,6 +12,7 @@ export default function RootLayout() {
             </main>
             <BottomNav />
             <Toaster position="top-center" richColors />
+            <WhatsAppFeedback />
         </div>
     )
 }
