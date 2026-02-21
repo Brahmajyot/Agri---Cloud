@@ -3,9 +3,10 @@ import { useEffect, useState, useRef } from "react"
 import { io } from "socket.io-client"
 import api from "@/lib/api"
 import { motion } from "framer-motion"
-import { FileText, Pencil, Check, X, Download, Trash2, Loader2 } from "lucide-react"
+import { FileText, Pencil, Check, X, Download, Trash2, Loader2, Upload } from "lucide-react"
 import DeleteModal from "@/components/ui/DeleteModal"
 import { toast } from "sonner"
+import { Link } from "react-router-dom"
 
 const SOCKET_URL = import.meta.env.VITE_API_URL || "http://localhost:3000"
 const MAX_WORDS = 150
@@ -26,20 +27,20 @@ function countWords(text: string) {
     return text.trim() === "" ? 0 : text.trim().split(/\s+/).length
 }
 
+function getDownloadUrl(url: string) {
+    return url.includes("cloudinary.com") ? url.replace("/upload/", "/upload/fl_attachment/") : url
+}
+
 export default function Profile() {
     const { user } = useUser()
     const [notes, setNotes] = useState<Note[]>([])
     const [loading, setLoading] = useState(true)
 
-    // About section
-    const [about, setAbout] = useState<string>(() =>
-        localStorage.getItem(`agricloud_about_${user?.id}`) || ""
-    )
+    const [about, setAbout] = useState<string>("")
     const [editingAbout, setEditingAbout] = useState(false)
     const [aboutDraft, setAboutDraft] = useState("")
     const textareaRef = useRef<HTMLTextAreaElement>(null)
 
-    // Delete modal
     const [deleteTarget, setDeleteTarget] = useState<Note | null>(null)
     const [isDeleting, setIsDeleting] = useState(false)
 
@@ -60,13 +61,9 @@ export default function Profile() {
 
     useEffect(() => {
         if (!user) return
-
-        // Load saved about from localStorage per user
         const saved = localStorage.getItem(`agricloud_about_${user.id}`)
         if (saved) setAbout(saved)
-
         fetchNotes()
-
         const socket = io(SOCKET_URL)
         socket.on("files_updated", () => fetchNotes())
         return () => { socket.disconnect() }
@@ -79,31 +76,20 @@ export default function Profile() {
     }
 
     const saveAbout = () => {
-        if (wordCount > MAX_WORDS) return
+        if (wordCount > MAX_WORDS || wordCount === 0) return
         localStorage.setItem(`agricloud_about_${user?.id}`, aboutDraft)
         setAbout(aboutDraft)
         setEditingAbout(false)
-        toast.success("About updated! ✅")
+        toast.success("Bio saved! ✅")
     }
 
-    const cancelAbout = () => {
-        setEditingAbout(false)
-        setAboutDraft("")
-    }
-
-    const handleAboutChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-        const val = e.target.value
-        // Allow typing but show warning when over limit
-        setAboutDraft(val)
-    }
+    const cancelAbout = () => { setEditingAbout(false); setAboutDraft("") }
 
     const handleDelete = async () => {
         if (!deleteTarget || !user) return
         setIsDeleting(true)
         try {
-            await api.delete(`/api/files/${deleteTarget.id}`, {
-                data: { userId: user.id }
-            })
+            await api.delete(`/api/files/${deleteTarget.id}`, { data: { userId: user.id } })
             setNotes(prev => prev.filter(n => n.id !== deleteTarget.id))
             toast.success("Note deleted 🗑️")
         } catch {
@@ -114,15 +100,14 @@ export default function Profile() {
         }
     }
 
-    const getDownloadUrl = (url: string) =>
-        url.includes("cloudinary.com") ? url.replace("/upload/", "/upload/fl_attachment/") : url
-
     if (!user) return null
 
-    return (
-        <div className="max-w-4xl mx-auto space-y-6 animate-fade-in p-4 md:p-6">
+    const joinedDate = new Date(user.createdAt || Date.now()).toLocaleDateString("en-IN", {
+        month: "short", year: "numeric"
+    })
 
-            {/* Delete Modal */}
+    return (
+        <div className="pb-10 animate-fade-in">
             <DeleteModal
                 isOpen={!!deleteTarget}
                 fileName={deleteTarget?.title}
@@ -130,176 +115,202 @@ export default function Profile() {
                 onCancel={() => setDeleteTarget(null)}
             />
 
-            {/* ── Hero Card ─────────────────────────────── */}
-            <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="glass-panel rounded-2xl border border-[var(--color-border)] relative overflow-hidden"
-            >
-                <div className="absolute top-0 left-0 w-full h-28 bg-gradient-to-r from-[var(--color-primary)]/25 to-[var(--color-secondary)]/25" />
-
-                <div className="p-6 md:p-8 pt-10 md:pt-10">
-                    <div className="flex flex-col md:flex-row items-center gap-6 mt-6">
-                        {/* Avatar */}
-                        <div className="relative shrink-0">
-                            <div className="w-28 h-28 rounded-full p-1 bg-white/10 backdrop-blur-md border border-[var(--color-border)] shadow-xl">
-                                <img
-                                    src={user.imageUrl}
-                                    alt={user.fullName || "User"}
-                                    className="w-full h-full rounded-full object-cover"
-                                />
-                            </div>
-                            <div className="absolute bottom-2 right-2 w-5 h-5 bg-green-500 rounded-full border-4 border-white shadow" title="Online" />
-                        </div>
-
-                        {/* Info */}
-                        <div className="text-center md:text-left space-y-1 flex-1">
-                            <h1 className="text-2xl md:text-3xl font-bold text-[var(--color-text-main)]">{user.fullName}</h1>
-                            <p className="text-[var(--color-text-muted)] flex items-center justify-center md:justify-start gap-2 text-sm">
-                                <span>📧</span> {user.primaryEmailAddress?.emailAddress}
-                            </p>
-                            <div className="flex items-center justify-center md:justify-start gap-2 pt-1">
-                                <span className="px-3 py-1 rounded-full text-xs font-semibold bg-[var(--color-primary)]/10 text-[var(--color-primary)]">Student</span>
-                                <span className="px-3 py-1 rounded-full text-xs font-semibold bg-[var(--color-secondary)]/10 text-[var(--color-secondary)]">AgriCloud</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Stats */}
-                    <div className="grid grid-cols-3 gap-3 mt-8">
-                        <StatCard icon="📤" label="Uploads" value={loading ? "…" : notes.length} />
-                        <StatCard icon="🌟" label="Reputation" value="Top 10%" />
-                        <StatCard icon="📅" label="Joined" value={new Date(user.createdAt || Date.now()).toLocaleDateString()} />
+            {/* ── Cover + Avatar ─────────────────────────── */}
+            <div className="relative">
+                {/* Cover banner */}
+                <div className="h-32 sm:h-44 w-full rounded-2xl bg-gradient-to-br from-[var(--color-primary)] via-[var(--color-primary-dark)] to-[var(--color-secondary)] relative overflow-hidden">
+                    {/* decorative blobs */}
+                    <div style={{ position: "absolute", top: "-30%", right: "-10%", width: 200, height: 200, borderRadius: "50%", background: "rgba(255,255,255,0.08)" }} />
+                    <div style={{ position: "absolute", bottom: "-20%", left: "5%", width: 140, height: 140, borderRadius: "50%", background: "rgba(255,255,255,0.06)" }} />
+                    <div className="absolute inset-0 flex items-center justify-center opacity-10">
+                        <span className="text-8xl">🌾</span>
                     </div>
                 </div>
-            </motion.div>
 
-            {/* ── About Section ─────────────────────────── */}
+                {/* Avatar — overlapping cover */}
+                <div className="absolute left-4 sm:left-8" style={{ bottom: "-44px" }}>
+                    <div className="relative inline-block">
+                        <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-full ring-4 ring-white shadow-xl overflow-hidden bg-white">
+                            <img
+                                src={user.imageUrl}
+                                alt={user.fullName || "User"}
+                                className="w-full h-full object-cover"
+                            />
+                        </div>
+                        <span title="Online" className="absolute bottom-1 right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white" />
+                    </div>
+                </div>
+            </div>
+
+            {/* ── Name / Email / Badges ─────────────────── */}
+            <div className="mt-14 sm:mt-16 px-2">
+                <div className="flex items-start justify-between gap-2 flex-wrap">
+                    <div>
+                        <h1 className="text-xl sm:text-2xl font-extrabold text-[var(--color-text-main)] leading-tight">
+                            {user.fullName}
+                        </h1>
+                        <p className="text-xs sm:text-sm text-[var(--color-text-muted)] mt-0.5">
+                            {user.primaryEmailAddress?.emailAddress}
+                        </p>
+                        <div className="flex flex-wrap gap-1.5 mt-2">
+                            <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-[var(--color-primary)]/10 text-[var(--color-primary)]">🎓 Student</span>
+                            <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-amber-50 text-amber-600">🌟 AgriCloud</span>
+                            <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-gray-100 text-gray-500">📅 Since {joinedDate}</span>
+                        </div>
+                    </div>
+
+                    {/* Upload CTA */}
+                    <Link to="/upload">
+                        <button className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-[var(--color-primary)] text-white text-xs font-bold shadow-sm hover:opacity-90 active:scale-95 transition-all mt-1">
+                            <Upload size={13} /> Upload Note
+                        </button>
+                    </Link>
+                </div>
+
+                {/* ── Stats row ──────────────────────────── */}
+                <div className="grid grid-cols-3 gap-2 mt-5">
+                    <StatPill icon="📤" label="Uploads" value={loading ? "…" : notes.length} />
+                    <StatPill icon="🌟" label="Reputation" value="Top 10%" />
+                    <StatPill icon="📚" label="Community" value="Active" />
+                </div>
+            </div>
+
+            {/* ── About Me ──────────────────────────────── */}
             <motion.div
-                initial={{ opacity: 0, y: 16 }}
+                initial={{ opacity: 0, y: 14 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.1 }}
-                className="glass-panel p-6 rounded-2xl border border-[var(--color-border)]"
+                className="mt-4 mx-0 bg-white rounded-2xl border border-[var(--color-border)] p-4 shadow-sm"
             >
-                <div className="flex items-center justify-between mb-3">
-                    <h2 className="text-lg font-bold text-[var(--color-text-main)]">About Me ✍️</h2>
+                <div className="flex items-center justify-between mb-2">
+                    <h2 className="text-sm font-bold text-[var(--color-text-main)]">About Me ✍️</h2>
                     {!editingAbout && (
                         <button
                             onClick={startEditAbout}
-                            className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full bg-[var(--color-primary)]/10 text-[var(--color-primary)] font-semibold hover:bg-[var(--color-primary)]/20 transition-colors"
+                            className="flex items-center gap-1 text-[11px] px-2.5 py-1 rounded-full bg-[var(--color-primary)]/10 text-[var(--color-primary)] font-bold hover:bg-[var(--color-primary)]/20 active:scale-95 transition-all"
                         >
-                            <Pencil size={12} /> Edit
+                            <Pencil size={10} /> Edit
                         </button>
                     )}
                 </div>
 
                 {editingAbout ? (
-                    <div className="space-y-3">
+                    <div className="space-y-2">
                         <textarea
                             ref={textareaRef}
                             value={aboutDraft}
-                            onChange={handleAboutChange}
-                            rows={5}
-                            placeholder="Tell your fellow students about yourself — your stream, interests, or what notes you usually share... 🌾"
-                            className="w-full rounded-xl border border-[var(--color-border)] bg-[var(--color-background)]/60 p-3 text-sm text-[var(--color-text-main)] placeholder:text-[var(--color-text-muted)] resize-none focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/30 transition-all"
+                            onChange={e => setAboutDraft(e.target.value)}
+                            rows={4}
+                            placeholder="Tell your fellow students about yourself — your stream, interests, favourite subjects... 🌾"
+                            className="w-full rounded-xl border border-[var(--color-border)] bg-gray-50 p-3 text-sm text-[var(--color-text-main)] placeholder:text-gray-400 resize-none focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/30 transition-all"
                         />
                         <div className="flex items-center justify-between">
-                            <span className={`text-xs font-medium ${wordsLeft < 0 ? "text-red-500" : wordsLeft <= 20 ? "text-amber-500" : "text-[var(--color-text-muted)]"}`}>
-                                {wordCount}/{MAX_WORDS} words {wordsLeft < 0 ? "— too long!" : ""}
+                            <span className={`text-[11px] font-medium ${wordsLeft < 0 ? "text-red-500" : wordsLeft <= 20 ? "text-amber-500" : "text-gray-400"}`}>
+                                {wordCount}/{MAX_WORDS} words{wordsLeft < 0 ? " — too long!" : ""}
                             </span>
                             <div className="flex gap-2">
-                                <button onClick={cancelAbout} className="flex items-center gap-1 px-3 py-1.5 rounded-lg border border-[var(--color-border)] text-xs font-semibold text-[var(--color-text-muted)] hover:bg-gray-50 transition-colors">
-                                    <X size={13} /> Cancel
+                                <button onClick={cancelAbout} className="flex items-center gap-1 px-3 py-1.5 rounded-lg border border-gray-200 text-[11px] font-semibold text-gray-500 hover:bg-gray-50 active:scale-95 transition-all">
+                                    <X size={11} /> Cancel
                                 </button>
                                 <button
                                     onClick={saveAbout}
                                     disabled={wordCount > MAX_WORDS || wordCount === 0}
-                                    className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-[var(--color-primary)] text-white text-xs font-semibold hover:opacity-90 transition-opacity disabled:opacity-40 disabled:cursor-not-allowed"
+                                    className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-[var(--color-primary)] text-white text-[11px] font-bold hover:opacity-90 active:scale-95 transition-all disabled:opacity-40"
                                 >
-                                    <Check size={13} /> Save
+                                    <Check size={11} /> Save
                                 </button>
                             </div>
                         </div>
                     </div>
                 ) : (
                     <p className="text-sm text-[var(--color-text-muted)] leading-relaxed">
-                        {about || (
-                            <span className="italic">
-                                No bio yet. Click <strong>Edit</strong> to tell your fellow students about yourself! 👋
-                            </span>
-                        )}
+                        {about || <span className="italic text-gray-400">No bio yet — tap <strong className="text-[var(--color-primary)]">Edit</strong> to introduce yourself! 👋</span>}
                     </p>
                 )}
             </motion.div>
 
             {/* ── My Uploads ────────────────────────────── */}
             <motion.div
-                initial={{ opacity: 0, y: 16 }}
+                initial={{ opacity: 0, y: 14 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.18 }}
-                className="glass-panel p-6 rounded-2xl border border-[var(--color-border)]"
+                className="mt-4 bg-white rounded-2xl border border-[var(--color-border)] shadow-sm overflow-hidden"
             >
-                <h2 className="text-lg font-bold text-[var(--color-text-main)] mb-4">
-                    My Uploads {!loading && <span className="ml-2 text-sm font-medium text-[var(--color-primary)] bg-[var(--color-primary)]/10 px-2 py-0.5 rounded-full">{notes.length}</span>}
-                </h2>
+                {/* Section header */}
+                <div className="flex items-center justify-between px-4 py-3 border-b border-[var(--color-border)]">
+                    <h2 className="text-sm font-bold text-[var(--color-text-main)] flex items-center gap-2">
+                        My Uploads
+                        {!loading && (
+                            <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-[var(--color-primary)]/10 text-[var(--color-primary)]">
+                                {notes.length}
+                            </span>
+                        )}
+                    </h2>
+                </div>
 
                 {loading ? (
                     <div className="flex justify-center py-10">
-                        <Loader2 className="h-8 w-8 animate-spin text-[var(--color-primary)]" />
+                        <Loader2 className="h-7 w-7 animate-spin text-[var(--color-primary)]" />
                     </div>
                 ) : notes.length === 0 ? (
-                    <div className="text-center py-10 text-[var(--color-text-muted)] space-y-2">
-                        <div className="text-4xl">📭</div>
-                        <p className="font-medium">No uploads yet!</p>
-                        <p className="text-sm">Share your notes and help the community 🌱</p>
+                    <div className="flex flex-col items-center justify-center py-12 px-4 text-center gap-2">
+                        <span className="text-5xl">📭</span>
+                        <p className="font-semibold text-[var(--color-text-muted)] text-sm">No uploads yet!</p>
+                        <p className="text-xs text-gray-400">Share your notes and help the community 🌱</p>
+                        <Link to="/upload">
+                            <button className="mt-3 px-4 py-2 rounded-xl bg-[var(--color-primary)] text-white text-xs font-bold hover:opacity-90 active:scale-95 transition-all">
+                                Upload your first note
+                            </button>
+                        </Link>
                     </div>
                 ) : (
-                    <div className="space-y-3">
+                    <div className="divide-y divide-[var(--color-border)]">
                         {notes.map((note, i) => (
                             <motion.div
                                 key={note.id}
-                                initial={{ opacity: 0, x: -12 }}
+                                initial={{ opacity: 0, x: -10 }}
                                 animate={{ opacity: 1, x: 0 }}
-                                transition={{ delay: i * 0.05 }}
-                                className="flex items-center gap-3 p-3 rounded-xl border border-[var(--color-border)] hover:border-[var(--color-primary)]/40 hover:bg-[var(--color-primary)]/5 transition-all group"
+                                transition={{ delay: i * 0.04 }}
+                                className="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 active:bg-gray-100 transition-colors"
                             >
-                                {/* Icon */}
-                                <div className="w-9 h-9 rounded-lg bg-[var(--color-primary)]/10 flex items-center justify-center shrink-0">
-                                    <FileText size={16} className="text-[var(--color-primary)]" />
+                                {/* File icon */}
+                                <div className="w-9 h-9 shrink-0 rounded-xl bg-[var(--color-primary)]/10 flex items-center justify-center">
+                                    <FileText size={15} className="text-[var(--color-primary)]" />
                                 </div>
 
-                                {/* Title & meta */}
+                                {/* Info */}
                                 <div className="flex-1 min-w-0">
-                                    <p className="font-semibold text-sm text-[var(--color-text-main)] truncate">{note.title}</p>
-                                    <p className="text-xs text-[var(--color-text-muted)]">
-                                        {note.subject} · Sem {note.semester} · {new Date(note.created_at).toLocaleDateString()}
+                                    <p className="font-semibold text-sm text-[var(--color-text-main)] truncate leading-tight">
+                                        {note.title}
+                                    </p>
+                                    <p className="text-[11px] text-[var(--color-text-muted)] mt-0.5">
+                                        {note.subject} · Sem {note.semester} · {new Date(note.created_at).toLocaleDateString("en-IN")}
                                     </p>
                                 </div>
 
-                                {/* Actions */}
-                                <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                {/* Action buttons — always visible on mobile */}
+                                <div className="flex items-center gap-1.5 shrink-0">
                                     <a
                                         href={getDownloadUrl(note.file_url)}
                                         target="_blank"
                                         rel="noopener noreferrer"
                                         title="Download"
-                                        className="w-8 h-8 rounded-lg bg-[var(--color-primary)]/10 hover:bg-[var(--color-primary)]/20 flex items-center justify-center transition-colors"
+                                        className="w-8 h-8 rounded-lg bg-[var(--color-primary)]/10 hover:bg-[var(--color-primary)]/20 flex items-center justify-center transition-colors active:scale-95"
                                     >
-                                        <Download size={14} className="text-[var(--color-primary)]" />
+                                        <Download size={13} className="text-[var(--color-primary)]" />
                                     </a>
                                     <button
                                         title="Delete"
                                         onClick={() => setDeleteTarget(note)}
-                                        className="w-8 h-8 rounded-lg bg-red-50 hover:bg-red-100 flex items-center justify-center transition-colors"
+                                        disabled={isDeleting && deleteTarget?.id === note.id}
+                                        className="w-8 h-8 rounded-lg bg-red-50 hover:bg-red-100 flex items-center justify-center transition-colors active:scale-95"
                                     >
-                                        <Trash2 size={14} className="text-red-500" />
+                                        {isDeleting && deleteTarget?.id === note.id
+                                            ? <Loader2 size={13} className="animate-spin text-red-400" />
+                                            : <Trash2 size={13} className="text-red-500" />
+                                        }
                                     </button>
                                 </div>
-
-                                {/* Deleting indicator */}
-                                {isDeleting && deleteTarget?.id === note.id && (
-                                    <Loader2 size={16} className="animate-spin text-red-400 shrink-0" />
-                                )}
                             </motion.div>
                         ))}
                     </div>
@@ -309,12 +320,12 @@ export default function Profile() {
     )
 }
 
-function StatCard({ label, value, icon }: { label: string; value: string | number; icon: string }) {
+function StatPill({ icon, label, value }: { icon: string; label: string; value: string | number }) {
     return (
-        <div className="bg-[var(--color-background)]/50 p-4 rounded-xl border border-[var(--color-border)] hover:border-[var(--color-secondary)]/40 transition-colors text-center">
-            <div className="text-2xl mb-1">{icon}</div>
-            <div className="text-xl font-bold text-[var(--color-text-main)]">{value}</div>
-            <div className="text-xs text-[var(--color-text-muted)] mt-0.5">{label}</div>
+        <div className="flex flex-col items-center justify-center py-3 px-1 bg-white rounded-xl border border-[var(--color-border)] shadow-sm text-center">
+            <span className="text-lg leading-tight">{icon}</span>
+            <span className="text-sm sm:text-base font-extrabold text-[var(--color-text-main)] mt-0.5 leading-tight">{value}</span>
+            <span className="text-[10px] text-[var(--color-text-muted)] mt-0.5">{label}</span>
         </div>
     )
 }
