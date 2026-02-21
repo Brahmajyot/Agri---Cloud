@@ -1,13 +1,6 @@
 import fs from 'fs';
-import { createRequire } from 'module';
-import { fileURLToPath } from 'url';
-import path from 'path';
-
-// pg and dotenv live in server/node_modules, not the root
-const require = createRequire(import.meta.url);
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const pg = require(path.join(__dirname, 'server', 'node_modules', 'pg'));
-const dotenv = require(path.join(__dirname, 'server', 'node_modules', 'dotenv'));
+import pg from 'pg';
+import dotenv from 'dotenv';
 
 dotenv.config();
 
