@@ -11,7 +11,6 @@ export default function Home() {
                 description="Agri Cloud — India's premium platform for B.Sc Agriculture students. Download free semester notes, previous year question papers (PYQ), and study materials for BHU, HAU, Agra University and more."
                 keywords="bsc agriculture notes pdf, b.sc agriculture 1st semester notes pdf, bsc agriculture previous year question paper pdf, bsc agriculture study material, bsc agriculture entrance exam syllabus, b.sc agriculture 2nd semester syllabus, arihant bsc agriculture book pdf, bsc agriculture questions papers UET bhu, agriculture notes free download"
                 canonical="/"
-                googleVerification="4LuRdJbgWeEJzE2VBr0fGM6pPVZlvG3nJnkrb5TeOuI"
             />
             {/* Hero */}
             <section className="text-center space-y-6 animate-fade-in">

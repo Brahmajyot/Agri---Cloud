@@ -8,8 +8,6 @@ interface SEOProps {
     canonical?: string
     /** Override OG image. Defaults to site logo. */
     ogImage?: string
-    /** Google Search Console verification tag */
-    googleVerification?: string
 }
 
 const SITE_NAME = 'Agri Cloud'
@@ -33,7 +31,6 @@ export default function SEO({
     keywords,
     canonical,
     ogImage = DEFAULT_OG_IMAGE,
-    googleVerification,
 }: SEOProps) {
     const fullTitle = `${title} | ${SITE_NAME}`
     const canonicalUrl = canonical ? `${BASE_URL}${canonical}` : undefined
@@ -45,7 +42,6 @@ export default function SEO({
             <meta name="description" content={description} />
             {keywords && <meta name="keywords" content={keywords} />}
             {canonicalUrl && <link rel="canonical" href={canonicalUrl} />}
-            {googleVerification && <meta name="google-site-verification" content={googleVerification} />}
 
             {/* Open Graph */}
             <meta property="og:site_name" content={SITE_NAME} />
