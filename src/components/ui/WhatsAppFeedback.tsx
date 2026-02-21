@@ -1,7 +1,7 @@
 import { useState } from "react";
 
-// ✅ Replace with your actual WhatsApp number (country code + number, no + or spaces)
-const WHATSAPP_NUMBER = "918260407905"; // digits only, no + or spaces
+// Number is loaded from .env — never hardcoded in source
+const WHATSAPP_NUMBER = import.meta.env.VITE_WHATSAPP_NUMBER as string;
 
 const DEFAULT_MESSAGE = "Hi! I need support with AgriCloud. 🌾";
 
