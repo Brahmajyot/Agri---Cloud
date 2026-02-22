@@ -3,11 +3,11 @@
     "trailingSlash": false,
     "headers": [
         {
-            "source": "/(sitemap\\.xml|robots\\.txt)",
+            "source": "/(sitemap_v2\\.xml|robots\\.txt)",
             "headers": [
                 {
                     "key": "Content-Type",
-                    "value": "application/xml"
+                    "value": "text/xml; charset=utf-8"
                 },
                 {
                     "key": "Cache-Control",
@@ -52,7 +52,7 @@
     ],
     "rewrites": [
         {
-            "source": "/((?!api/|assets/|logo\\.jpg|vite\\.svg|manifest\\.json|favicon\\.ico|sitemap\\.xml|robots\\.txt|google.*\\.html).*)",
+            "source": "/((?!api/|assets/|logo\\.jpg|vite\\.svg|manifest\\.json|favicon\\.ico|sitemap_v2\\.xml|robots\\.txt|google.*\\.html).*)",
             "destination": "/index.html"
         }
     ]

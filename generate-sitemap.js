@@ -61,8 +61,8 @@ ${allRoutes.map(r => `  <url>
   </url>`).join('\n')}
 </urlset>`;
 
-    fs.writeFileSync('./public/sitemap.xml', xml, 'utf8');
-    console.log(`✅ Sitemap written to public/sitemap.xml (${allRoutes.length} URLs)`);
+    fs.writeFileSync('./public/sitemap_v2.xml', xml, 'utf8');
+    console.log(`✅ Sitemap written to public/sitemap_v2.xml (${allRoutes.length} URLs)`);
 }
 
 generateSitemap().catch(err => {
