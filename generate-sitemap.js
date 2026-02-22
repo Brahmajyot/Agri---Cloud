@@ -35,7 +35,7 @@ async function generateSitemap() {
             url: `/notes/${row.slug}`,
             changefreq: 'weekly',
             priority: 0.8,
-            lastmod: new Date(row.created_at).toISOString(),
+            lastmod: new Date(row.created_at).toISOString().split('T')[0],
         }));
 
         console.log(`   Found ${dynamicRoutes.length} note pages`);
@@ -45,7 +45,7 @@ async function generateSitemap() {
         await pool.end();
     }
 
-    const today = new Date().toISOString();
+    const today = new Date().toISOString().split('T')[0];
     const allRoutes = [...STATIC_ROUTES, ...dynamicRoutes];
 
     const xml = `<?xml version="1.0" encoding="UTF-8"?>
