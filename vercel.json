@@ -3,7 +3,7 @@
     "trailingSlash": false,
     "headers": [
         {
-            "source": "/(sitemap_v2\\.xml|robots\\.txt)",
+            "source": "/sitemap_v2.xml",
             "headers": [
                 {
                     "key": "Content-Type",
@@ -20,12 +20,12 @@
             "headers": [
                 {
                     "key": "Content-Type",
-                    "value": "text/plain"
+                    "value": "text/plain; charset=utf-8"
                 }
             ]
         },
         {
-            "source": "/((?!sitemap\\.xml|robots\\.txt|api/).*)",
+            "source": "/((?!sitemap_v2\\.xml|robots\\.txt|api/).*)",
             "headers": [
                 {
                     "key": "X-Frame-Options",
