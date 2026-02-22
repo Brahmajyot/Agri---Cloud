@@ -45,14 +45,17 @@ async function generateSitemap() {
         await pool.end();
     }
 
-    const today = new Date().toISOString().split('T')[0];
+    // Use yesterday's date to ensure it's never in the "future" for Google's servers (timezones)
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+    const dateStr = yesterday.toISOString().split('T')[0];
     const allRoutes = [...STATIC_ROUTES, ...dynamicRoutes];
 
     const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 ${allRoutes.map(r => `  <url>
     <loc>${BASE_URL}${r.url}</loc>
-    <lastmod>${r.lastmod ?? today}</lastmod>
+    <lastmod>${dateStr}</lastmod>
     <changefreq>${r.changefreq}</changefreq>
     <priority>${r.priority.toFixed(1)}</priority>
   </url>`).join('\n')}
