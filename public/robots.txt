@@ -12,4 +12,4 @@ Disallow: /profile
 Disallow: /api/
 
 # Point crawlers to the sitemap
-Sitemap: https://agri-cloud-tau.vercel.app/sitemap_v2.xml
+Sitemap: https://agri-cloud-tau.vercel.app/sitemap.xml

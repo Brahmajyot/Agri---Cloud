@@ -1,13 +1,21 @@
 {
-    "cleanUrls": true,
-    "trailingSlash": false,
+    "rewrites": [
+        {
+            "source": "/(sitemap\\.xml|robots\\.txt|google.*\\.html)",
+            "destination": "/$1"
+        },
+        {
+            "source": "/((?!api/|assets/|logo\\.jpg|vite\\.svg|manifest\\.json|favicon\\.ico).*)",
+            "destination": "/index.html"
+        }
+    ],
     "headers": [
         {
-            "source": "/sitemap_v2.xml",
+            "source": "/sitemap.xml",
             "headers": [
                 {
                     "key": "Content-Type",
-                    "value": "text/xml; charset=utf-8"
+                    "value": "application/xml"
                 },
                 {
                     "key": "Cache-Control",
@@ -20,12 +28,12 @@
             "headers": [
                 {
                     "key": "Content-Type",
-                    "value": "text/plain; charset=utf-8"
+                    "value": "text/plain"
                 }
             ]
         },
         {
-            "source": "/((?!sitemap_v2\\.xml|robots\\.txt|api/).*)",
+            "source": "/((?!sitemap\\.xml|robots\\.txt|api/).*)",
             "headers": [
                 {
                     "key": "X-Frame-Options",
@@ -48,12 +56,6 @@
                     "value": "same-origin-allow-popups"
                 }
             ]
-        }
-    ],
-    "rewrites": [
-        {
-            "source": "/((?!api/|assets/|logo\\.jpg|vite\\.svg|manifest\\.json|favicon\\.ico|sitemap_v2\\.xml|robots\\.txt|google.*\\.html).*)",
-            "destination": "/index.html"
         }
     ]
 }
