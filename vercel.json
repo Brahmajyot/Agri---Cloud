@@ -1,7 +1,13 @@
 {
+    "cleanUrls": true,
+    "trailingSlash": false,
     "rewrites": [
         {
-            "source": "/((?!api/|sitemap\\.xml|robots\\.txt|google.*\\.html|assets/|logo\\.jpg|vite\\.svg|manifest\\.json|favicon\\.ico).*)",
+            "source": "/(sitemap\\.xml|robots\\.txt|google.*\\.html)",
+            "destination": "/$1"
+        },
+        {
+            "source": "/((?!api/|assets/|logo\\.jpg|vite\\.svg|manifest\\.json|favicon\\.ico).*)",
             "destination": "/index.html"
         }
     ],
@@ -11,7 +17,11 @@
             "headers": [
                 {
                     "key": "Content-Type",
-                    "value": "application/xml"
+                    "value": "application/xml; charset=utf-8"
+                },
+                {
+                    "key": "X-Content-Type-Options",
+                    "value": "nosniff"
                 }
             ]
         },
@@ -20,7 +30,7 @@
             "headers": [
                 {
                     "key": "Content-Type",
-                    "value": "text/plain"
+                    "value": "text/plain; charset=utf-8"
                 }
             ]
         },
